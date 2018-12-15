@@ -1,0 +1,105 @@
+--- a/arch/mips/ath79/dev-usb.c
++++ b/arch/mips/ath79/dev-usb.c
+@@ -152,6 +152,8 @@ static void __init ar724x_usb_setup(void
+ 
+ static void __init ar913x_usb_setup(void)
+ {
++	ath79_pll_wr(8, 0x1030); /* USB Start on Dir-615C* */
++
+ 	ath79_device_reset_set(AR913X_RESET_USBSUS_OVERRIDE);
+ 	mdelay(10);
+ 
+--- a/arch/mips/ath79/mach-dir-600-a1.c
++++ b/arch/mips/ath79/mach-dir-600-a1.c
+@@ -17,6 +17,7 @@
+ #include "dev-eth.h"
+ #include "dev-gpio-buttons.h"
+ #include "dev-leds-gpio.h"
++#include "dev-usb.h"
+ #include "dev-m25p80.h"
+ #include "machtypes.h"
+ #include "nvram.h"
+@@ -135,6 +136,9 @@ static void __init dir_600_a1_setup(void
+ 	/* WAN port */
+ 	ath79_register_eth(0);
+ 
++	/* USB port */
++	ath79_register_usb();
++
+ 	ap91_pci_init(ee, mac);
+ }
+ 
+--- a/arch/mips/ath79/mach-dir-615-c1.c
++++ b/arch/mips/ath79/mach-dir-615-c1.c
+@@ -14,6 +14,7 @@
+ #include "dev-eth.h"
+ #include "dev-gpio-buttons.h"
+ #include "dev-leds-gpio.h"
++#include "dev-usb.h"
+ #include "dev-m25p80.h"
+ #include "dev-wmac.h"
+ #include "machtypes.h"
+@@ -118,6 +119,7 @@ static void __init dir_615c1_setup(void)
+ 
+ 	ath79_register_eth(0);
+ 	ath79_register_eth(1);
++	ath79_register_usb();
+ 
+ 	ath79_register_m25p80(NULL);
+ 
+--- a/arch/mips/ath79/Kconfig.openwrt
++++ b/arch/mips/ath79/Kconfig.openwrt
+@@ -480,6 +480,26 @@ config ATH79_MACH_DIR_600_A1
+ 	select ATH79_DEV_M25P80
+ 	select ATH79_NVRAM
+ 
++config ATH79_MACH_DIR_600_A1_USB
++	bool "D-Link DIR-600 A1/DIR-615 E1/DIR-615 E4 USB support"
++	select SOC_AR724X
++	select ATH79_DEV_AP9X_PCI if PCI
++	select ATH79_DEV_ETH
++	select ATH79_DEV_GPIO_BUTTONS
++	select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_M25P80
++	select ATH79_NVRAM
++	select ATH79_DEV_USB
++	select EXT2_FS
++	select SCSI
++	select USB
++	select USB_COMMON
++	select USB_STORAGE
++	select USB_OHCI_ATH79
++	select USB_OHCI_HCD
++	select USB_OHCI_HCD_PLATFORM
++	select BLK_DEV_SD
++
+ config ATH79_MACH_DIR_615_C1
+ 	bool "D-Link DIR-615 rev. C1 support"
+ 	select SOC_AR913X
+@@ -490,6 +510,26 @@ config ATH79_MACH_DIR_615_C1
+ 	select ATH79_DEV_WMAC
+ 	select ATH79_NVRAM
+ 
++config ATH79_MACH_DIR_615_C1_USB
++	bool "D-Link DIR-615 rev. C1 USB support"
++	select SOC_AR913X
++	select ATH79_DEV_ETH
++	select ATH79_DEV_GPIO_BUTTONS
++        select ATH79_DEV_LEDS_GPIO
++	select ATH79_DEV_M25P80
++	select ATH79_DEV_WMAC
++	select ATH79_NVRAM
++	select ATH79_DEV_USB
++	select EXT2_FS
++	select SCSI
++	select USB
++	select USB_COMMON
++	select USB_STORAGE
++	select USB_EHCI_ATH79
++	select USB_EHCI_HCD
++	select USB_EHCI_HCD_PLATFORM
++	select BLK_DEV_SD
++
+ config ATH79_MACH_DIR_615_I1
+ 	bool "D-Link DIR-615 rev. I1 support"
+ 	select SOC_AR934X
